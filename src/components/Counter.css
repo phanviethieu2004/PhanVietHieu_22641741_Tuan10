@@ -2,12 +2,17 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 2rem auto;
+    margin: 0 auto;
     padding: 2rem;
-    max-width: 400px;
+    width: 100%;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: #f9f9f9;
+}
+
+.counter h2 {
+    margin-top: 0;
+    color: #333;
 }
 
 .counter-display {
