@@ -2,13 +2,28 @@
 
 import { useState, useEffect } from "react"
 import { Provider } from "react-redux"
-import { configureStore, createSlice } from "@reduxjs/toolkit"
+import { configureStore, createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import { Sun, Moon } from "./ThemeIcons.jsx"
 import ShoppingCart from "./ShoppingCart.jsx"
 import AuthComponent from "./AuthComponent.jsx"
+import UserList from "./UserList.jsx"
 import "./App.css"
 
-// Tạo slice với counter, theme, cart và auth
+// Add the fetchUsers async thunk before the appSlice
+export const fetchUsers = createAsyncThunk("app/fetchUsers", async (_, { rejectWithValue }) => {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/users")
+    if (!response.ok) {
+      throw new Error("Server Error")
+    }
+    const data = await response.json()
+    return data
+  } catch (error) {
+    return rejectWithValue(error.message)
+  }
+})
+
+// Tạo slice với counter, theme, cart, auth và users
 const appSlice = createSlice({
   name: "app",
   initialState: {
@@ -30,6 +45,11 @@ const appSlice = createSlice({
     auth: {
       user: null,
       isLoggedIn: false,
+    },
+    users: {
+      items: [],
+      status: "idle", // idle | loading | succeeded | failed
+      error: null,
     },
   },
   reducers: {
@@ -94,9 +114,24 @@ const appSlice = createSlice({
       state.auth.user = { ...state.auth.user, ...action.payload }
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUsers.pending, (state) => {
+        state.users.status = "loading"
+        state.users.error = null
+      })
+      .addCase(fetchUsers.fulfilled, (state, action) => {
+        state.users.status = "succeeded"
+        state.users.items = action.payload
+      })
+      .addCase(fetchUsers.rejected, (state, action) => {
+        state.users.status = "failed"
+        state.users.error = action.payload
+      })
+  },
 })
 
-// Export actions
+// Update the exported actions to include fetchUsers
 export const {
   increment,
   decrement,
@@ -329,6 +364,16 @@ function App() {
                 <p>Hiển thị giao diện đăng nhập / chào mừng người dùng</p>
               </div>
               <AuthComponent />
+            </div>
+
+            <div className={`exercise-card ${theme}`}>
+              <h2 className="exercise-title">Bài 6: Đồng bộ dữ liệu từ API (Async Thunk)</h2>
+              <div className="exercise-description">
+                <p>Sử dụng createAsyncThunk để gọi API lấy danh sách users</p>
+                <p>State: users, status, error</p>
+                <p>Action: fetchUsers</p>
+              </div>
+              <UserList />
             </div>
           </div>
         </header>
