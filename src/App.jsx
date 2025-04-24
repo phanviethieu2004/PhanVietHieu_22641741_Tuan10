@@ -5,9 +5,10 @@ import { Provider } from "react-redux"
 import { configureStore, createSlice } from "@reduxjs/toolkit"
 import { Sun, Moon } from "./ThemeIcons.jsx"
 import ShoppingCart from "./ShoppingCart.jsx"
+import AuthComponent from "./AuthComponent.jsx"
 import "./App.css"
 
-// Tạo slice với counter, theme và cart
+// Tạo slice với counter, theme, cart và auth
 const appSlice = createSlice({
   name: "app",
   initialState: {
@@ -25,6 +26,10 @@ const appSlice = createSlice({
     },
     cart: {
       items: [],
+    },
+    auth: {
+      user: null,
+      isLoggedIn: false,
     },
   },
   reducers: {
@@ -76,6 +81,18 @@ const appSlice = createSlice({
         item.quantity = Math.max(1, quantity)
       }
     },
+    // Auth actions
+    login: (state, action) => {
+      state.auth.isLoggedIn = true
+      state.auth.user = action.payload
+    },
+    logout: (state) => {
+      state.auth.isLoggedIn = false
+      state.auth.user = null
+    },
+    setUserInfo: (state, action) => {
+      state.auth.user = { ...state.auth.user, ...action.payload }
+    },
   },
 })
 
@@ -90,6 +107,9 @@ export const {
   addItem,
   removeItem,
   updateQuantity,
+  login,
+  logout,
+  setUserInfo,
 } = appSlice.actions
 
 // Tạo store
@@ -299,6 +319,16 @@ function App() {
                 <p>Tính tổng số lượng và tổng tiền</p>
               </div>
               <ShoppingCart products={products} />
+            </div>
+
+            <div className={`exercise-card ${theme}`}>
+              <h2 className="exercise-title">Bài 5: Quản lý user đăng nhập (Auth)</h2>
+              <div className="exercise-description">
+                <p>State: user, isLoggedIn</p>
+                <p>Action: login, logout, setUserInfo</p>
+                <p>Hiển thị giao diện đăng nhập / chào mừng người dùng</p>
+              </div>
+              <AuthComponent />
             </div>
           </div>
         </header>
