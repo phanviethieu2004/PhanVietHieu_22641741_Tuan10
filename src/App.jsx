@@ -60,6 +60,12 @@ const appSlice = createSlice({
     decrement: (state) => {
       state.counter.value -= 1
     },
+    incrementByAmount: (state, action) => {
+      state.counter.value += Number(action.payload)
+    },
+    resetCounter: (state) => {
+      state.counter.value = 0
+    },
     // Theme actions
     toggleTheme: (state) => {
       state.theme.mode = state.theme.mode === "light" ? "dark" : "light"
@@ -135,6 +141,8 @@ const appSlice = createSlice({
 export const {
   increment,
   decrement,
+  incrementByAmount,
+  resetCounter,
   toggleTheme,
   addTodo,
   toggleTodo,
@@ -184,10 +192,11 @@ function ThemeToggle() {
   )
 }
 
-// Counter Component (Bài tập 1)
+// Counter Component (Bài tập 1 & 7)
 function Counter() {
   const [count, setCount] = useState(store.getState().counter.value)
   const [theme, setTheme] = useState(store.getState().theme.mode)
+  const [incrementAmount, setIncrementAmount] = useState(1)
 
   const handleIncrement = () => {
     store.dispatch(increment())
@@ -196,6 +205,16 @@ function Counter() {
 
   const handleDecrement = () => {
     store.dispatch(decrement())
+    setCount(store.getState().counter.value)
+  }
+
+  const handleReset = () => {
+    store.dispatch(resetCounter())
+    setCount(store.getState().counter.value)
+  }
+
+  const handleIncrementByAmount = () => {
+    store.dispatch(incrementByAmount(incrementAmount))
     setCount(store.getState().counter.value)
   }
 
@@ -217,6 +236,21 @@ function Counter() {
         </button>
         <button className="counter-button increment" onClick={handleIncrement}>
           Tăng
+        </button>
+        <button className="counter-button reset" onClick={handleReset}>
+          Reset
+        </button>
+      </div>
+      <div className="counter-custom-increment">
+        <input
+          type="number"
+          value={incrementAmount}
+          onChange={(e) => setIncrementAmount(e.target.value)}
+          className={`counter-input ${theme}`}
+          min="1"
+        />
+        <button className="counter-button increment-by-amount" onClick={handleIncrementByAmount}>
+          Tăng theo giá trị
         </button>
       </div>
     </div>
@@ -315,9 +349,10 @@ function App() {
 
           <div className="exercises-container">
             <div className={`exercise-card ${theme}`}>
-              <h2 className="exercise-title">Bài 1: Counter App</h2>
+              <h2 className="exercise-title">Bài 1 & 7: Counter App Nâng cao</h2>
               <div className="exercise-description">
                 <p>Sử dụng createSlice để tạo các action: increment, decrement</p>
+                <p>Thêm nút reset và incrementByAmount</p>
               </div>
               <Counter />
             </div>

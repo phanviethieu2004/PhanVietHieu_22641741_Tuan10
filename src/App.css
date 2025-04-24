@@ -141,6 +141,53 @@
   background-color: #d32f2f;
 }
 
+/* Enhanced Counter Styles */
+.counter-custom-increment {
+  display: flex;
+  margin-top: 15px;
+  width: 100%;
+  gap: 10px;
+}
+
+.counter-input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.counter-input.light {
+  background-color: #fff;
+  color: #333;
+}
+
+.counter-input.dark {
+  background-color: #444;
+  color: #fff;
+  border-color: #555;
+}
+
+.counter-button.reset {
+  background-color: #ff9800;
+  color: white;
+}
+
+.counter-button.reset:hover {
+  background-color: #e68a00;
+}
+
+.counter-button.increment-by-amount {
+  background-color: #2196f3;
+  color: white;
+  flex: 2;
+}
+
+.counter-button.increment-by-amount:hover {
+  background-color: #0b7dda;
+}
+
 /* Theme Toggle Styles */
 .theme-toggle-button {
   position: absolute;
