@@ -7,6 +7,7 @@ import { Sun, Moon } from "./ThemeIcons.jsx"
 import ShoppingCart from "./ShoppingCart.jsx"
 import AuthComponent from "./AuthComponent.jsx"
 import UserList from "./UserList.jsx"
+import CalculatorForm from "./CalculatorForm.jsx"
 import "./App.css"
 
 // Add the fetchUsers async thunk before the appSlice
@@ -23,7 +24,7 @@ export const fetchUsers = createAsyncThunk("app/fetchUsers", async (_, { rejectW
   }
 })
 
-// Tạo slice với counter, theme, cart, auth và users
+// Tạo slice với counter, theme, cart, auth, users và calculator
 const appSlice = createSlice({
   name: "app",
   initialState: {
@@ -50,6 +51,20 @@ const appSlice = createSlice({
       items: [],
       status: "idle", // idle | loading | succeeded | failed
       error: null,
+    },
+    calculator: {
+      activeCalculator: "bmi",
+      bmi: {
+        height: "",
+        weight: "",
+        result: null,
+        classification: "",
+      },
+      tax: {
+        income: "",
+        result: null,
+        breakdown: {},
+      },
     },
   },
   reducers: {
@@ -119,6 +134,111 @@ const appSlice = createSlice({
     setUserInfo: (state, action) => {
       state.auth.user = { ...state.auth.user, ...action.payload }
     },
+    // Calculator actions
+    updateInput: (state, action) => {
+      const { calculator, field, value } = action.payload
+      state.calculator[calculator][field] = value
+    },
+    calculateResult: (state) => {
+      if (state.calculator.activeCalculator === "bmi") {
+        // Calculate BMI
+        const height = Number.parseFloat(state.calculator.bmi.height) / 100 // convert cm to m
+        const weight = Number.parseFloat(state.calculator.bmi.weight)
+
+        if (height > 0 && weight > 0) {
+          const bmi = weight / (height * height)
+          state.calculator.bmi.result = bmi
+
+          // Determine BMI classification
+          if (bmi < 18.5) {
+            state.calculator.bmi.classification = "Thiếu cân"
+          } else if (bmi < 25) {
+            state.calculator.bmi.classification = "Bình thường"
+          } else if (bmi < 30) {
+            state.calculator.bmi.classification = "Thừa cân"
+          } else {
+            state.calculator.bmi.classification = "Béo phì"
+          }
+        }
+      } else if (state.calculator.activeCalculator === "tax") {
+        // Calculate income tax (simplified Vietnamese personal income tax)
+        const income = Number.parseFloat(state.calculator.tax.income)
+        let tax = 0
+        const breakdown = {}
+
+        if (income > 0) {
+          // Tax brackets (simplified for demonstration)
+          if (income <= 5000000) {
+            tax = income * 0.05
+            breakdown["Bậc 1 (5%)"] = tax
+          } else if (income <= 10000000) {
+            breakdown["Bậc 1 (5%)"] = 5000000 * 0.05
+            breakdown["Bậc 2 (10%)"] = (income - 5000000) * 0.1
+            tax = breakdown["Bậc 1 (5%)"] + breakdown["Bậc 2 (10%)"]
+          } else if (income <= 18000000) {
+            breakdown["Bậc 1 (5%)"] = 5000000 * 0.05
+            breakdown["Bậc 2 (10%)"] = 5000000 * 0.1
+            breakdown["Bậc 3 (15%)"] = (income - 10000000) * 0.15
+            tax = breakdown["Bậc 1 (5%)"] + breakdown["Bậc 2 (10%)"] + breakdown["Bậc 3 (15%)"]
+          } else if (income <= 32000000) {
+            breakdown["Bậc 1 (5%)"] = 5000000 * 0.05
+            breakdown["Bậc 2 (10%)"] = 5000000 * 0.1
+            breakdown["Bậc 3 (15%)"] = 8000000 * 0.15
+            breakdown["Bậc 4 (20%)"] = (income - 18000000) * 0.2
+            tax =
+              breakdown["Bậc 1 (5%)"] + breakdown["Bậc 2 (10%)"] + breakdown["Bậc 3 (15%)"] + breakdown["Bậc 4 (20%)"]
+          } else if (income <= 52000000) {
+            breakdown["Bậc 1 (5%)"] = 5000000 * 0.05
+            breakdown["Bậc 2 (10%)"] = 5000000 * 0.1
+            breakdown["Bậc 3 (15%)"] = 8000000 * 0.15
+            breakdown["Bậc 4 (20%)"] = 14000000 * 0.2
+            breakdown["Bậc 5 (25%)"] = (income - 32000000) * 0.25
+            tax =
+              breakdown["Bậc 1 (5%)"] +
+              breakdown["Bậc 2 (10%)"] +
+              breakdown["Bậc 3 (15%)"] +
+              breakdown["Bậc 4 (20%)"] +
+              breakdown["Bậc 5 (25%)"]
+          } else if (income <= 80000000) {
+            breakdown["Bậc 1 (5%)"] = 5000000 * 0.05
+            breakdown["Bậc 2 (10%)"] = 5000000 * 0.1
+            breakdown["Bậc 3 (15%)"] = 8000000 * 0.15
+            breakdown["Bậc 4 (20%)"] = 14000000 * 0.2
+            breakdown["Bậc 5 (25%)"] = 20000000 * 0.25
+            breakdown["Bậc 6 (30%)"] = (income - 52000000) * 0.3
+            tax =
+              breakdown["Bậc 1 (5%)"] +
+              breakdown["Bậc 2 (10%)"] +
+              breakdown["Bậc 3 (15%)"] +
+              breakdown["Bậc 4 (20%)"] +
+              breakdown["Bậc 5 (25%)"] +
+              breakdown["Bậc 6 (30%)"]
+          } else {
+            breakdown["Bậc 1 (5%)"] = 5000000 * 0.05
+            breakdown["Bậc 2 (10%)"] = 5000000 * 0.1
+            breakdown["Bậc 3 (15%)"] = 8000000 * 0.15
+            breakdown["Bậc 4 (20%)"] = 14000000 * 0.2
+            breakdown["Bậc 5 (25%)"] = 20000000 * 0.25
+            breakdown["Bậc 6 (30%)"] = 28000000 * 0.3
+            breakdown["Bậc 7 (35%)"] = (income - 80000000) * 0.35
+            tax =
+              breakdown["Bậc 1 (5%)"] +
+              breakdown["Bậc 2 (10%)"] +
+              breakdown["Bậc 3 (15%)"] +
+              breakdown["Bậc 4 (20%)"] +
+              breakdown["Bậc 5 (25%)"] +
+              breakdown["Bậc 6 (30%)"] +
+              breakdown["Bậc 7 (35%)"]
+          }
+
+          state.calculator.tax.result = tax
+          state.calculator.tax.breakdown = breakdown
+        }
+      }
+    },
+    setActiveCalculator: (state, action) => {
+      state.calculator.activeCalculator = action.payload
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -137,7 +257,7 @@ const appSlice = createSlice({
   },
 })
 
-// Update the exported actions to include fetchUsers
+// Update the exported actions to include calculator actions
 export const {
   increment,
   decrement,
@@ -153,6 +273,9 @@ export const {
   login,
   logout,
   setUserInfo,
+  updateInput,
+  calculateResult,
+  setActiveCalculator,
 } = appSlice.actions
 
 // Tạo store
@@ -409,6 +532,16 @@ function App() {
                 <p>Action: fetchUsers</p>
               </div>
               <UserList />
+            </div>
+
+            <div className={`exercise-card ${theme}`}>
+              <h2 className="exercise-title">Bài 8: Form tính toán đơn giản</h2>
+              <div className="exercise-description">
+                <p>State: dữ liệu form và kết quả tính toán</p>
+                <p>Action: updateInput, calculateResult</p>
+                <p>Tính BMI và thuế thu nhập cá nhân</p>
+              </div>
+              <CalculatorForm />
             </div>
           </div>
         </header>
